@@ -1,5 +1,4 @@
 
-
 from bs4 import BeautifulSoup
 
 with open('\\index.html','r') as wb_data:
@@ -15,3 +14,5 @@ for title,image,star in zip(titles,images,stars):
         'star':len(star.find_all('span',class_='glyphicon glyphicon-star'))  #使用find_all可以找到所有的星
     }
     print(data)
+    
+    
