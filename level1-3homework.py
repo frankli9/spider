@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import time
 
-info=[]
+
 # url = 'http://bj.xiaozhu.com/search-duanzufang-p3-0/'
 urls=['http://bj.xiaozhu.com/search-duanzufang-p{}-0/'.format(str(i)) for i in range(1,4)]
 headers = {
@@ -11,6 +11,7 @@ headers = {
 }
 
 def get_info(url):
+    info=[]
     wb_data = requests.get(url,headers=headers)
     time.sleep(2)
     soup = BeautifulSoup(wb_data.text,'lxml')
