@@ -1,0 +1,5 @@
+
+cd d:\mongodb\bin
+
+d:\mongodb\bin>mongoimport -d *database_name(like:text) -c *table_name(like:ganji) --file\C:\User\*pc_name\file_name.json
+
