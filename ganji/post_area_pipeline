@@ -1,0 +1,35 @@
+import pymongo
+import charts
+
+client = pymongo.MongoClient('localhost',27017)
+ganji_zufang = client['ganji_zufang']
+item_infoY = ganji_zufang['item_infoY']
+
+def data_gen(date,price):
+    pipeline = [
+        {'$match':{'$and':[{'post_time':date},{'price':price}]}},
+        {'$group':{'_id':{'$slice':['$area',1,1]},'counts':{'$sum':1}}}, #此1代表数量+1
+        {'$sort':{'counts':-1}},   #此-1代表倒序
+        {'$limit':25}
+    ]
+    for i in item_infoY.aggregate(pipeline):
+        yield [i['_id'][0],i['counts']]
+
+options = {
+    'chart'   : {'zoomType':'xy'},
+    'title'   : {'text': '2017.05.05赶集网各地区房屋出租信息发帖量统计'},
+    'subtitle': {'text': '统计均价5000元的出租信息'},
+    }
+
+
+series =  [{
+    'type': 'pie',
+    'name': 'pie charts',
+    'data':[i for i in data_gen('2017.05.05','5000')]
+
+        }]
+charts.plot(series,options=options,show='inline')
+
+
+#知识点为：
+#1.pipeline的使用
