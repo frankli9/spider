@@ -1,0 +1,56 @@
+import pymongo
+import charts
+from datetime import timedelta,date
+
+client = pymongo.MongoClient('localhost',27017)
+ganji_zufang = client['ganji_zufang']
+item_infoY = ganji_zufang['item_infoY']
+
+for i in item_infoY.find():
+    frags = i['post_time'].split('-')
+    if len(frags) == 1:
+        date = frags[0]
+    else:
+        date = '{}.{}.{}'.format(frags[0],frags[1],frags[2])
+    item_infoY.update_one({'_id':i['_id']},{'$set':{'post_time':date}})
+    
+def get_all_dates(date1,date2):
+    the_date = date(int(date1.split('.')[0]),int(date1.split('.')[1]),int(date1.split('.')[2]))
+    end_date = date(int(date2.split('.')[0]),int(date2.split('.')[1]),int(date2.split('.')[2]))
+    days = timedelta(days=1)
+    while the_date <= end_date:
+        yield (the_date.strftime('%Y.%m.%d'))
+        the_date = the_date + days
+        
+        
+def get_data_within(date1,date2,areas):
+    for area in areas:
+        area_day_posts = []
+        for date in get_all_dates(date1,date2):
+            a=list(item_infoY.find({'post_time':date,'area':area}))
+            each_day_post = len(a)
+            area_day_posts.append(each_day_post)
+        data = {
+            'name':area,
+            'data':area_day_posts,
+            'type':'line'
+        }
+        yield data
+
+options = {
+    'chart':{'zoomType':'xy'},
+    'title':{'text':'发帖量统计'},
+    'subtitle':{'text':'可视化统计图表(由于数据采集日期为5月5日，可以看出4天前的帖子基本已经删除)'},
+    'xAxis':{'categories':[i for i in get_all_dates('2017.05.01','2017.05.05')]},
+    'yAxis':{'title':{'text':'数量'}}
+    }
+
+series = [i for i in get_data_within('2017.05.01','2017.05.05',['朝阳','海淀','通州'])]
+charts.plot(series,options=options,show='inline')
+
+#知识点：
+1.日期数据的整理和更新
+2.时间的计算
+3.列表解析式的应用
+
+
