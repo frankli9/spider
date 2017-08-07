@@ -1,0 +1,7 @@
+from selenium import webdriver
+
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--proxy-server=%s'%str(proxy_ip))
+chrome = webdriver.Chrome(chrome_options=chrome_options)
+chrome.get('http://httpbin.org/ip')
+print(chrome.page_source)
