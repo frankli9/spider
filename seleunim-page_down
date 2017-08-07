@@ -1,0 +1,62 @@
+
+from bs4 import BeautifulSoup
+import re,os,requests,random,time,urllib.request,csv
+from lxml import etree
+from PIL import Image
+from selenium.webdriver.common.keys import Keys
+from selenium import webdriver
+
+
+#模拟浏览器登录
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+    'Cookie':'__gads=ID=e90e92452442eef2:T=1497427490:S=ALNI_MZi4whQxIsWkk8QW0yrpnZ7MyTtfw; bdshare_firstime=1497599748961; PHPSESSID=jbnm2jk08p9fripuj44lu07427; yunsuo_session_verify=df3422073e655cde45e3dc9018fb2f94; Hm_lvt_adaf29565debc85c07b8d3c36c148a6b=1497604233,1497604246,1497604251,1497921441; Hm_lpvt_adaf29565debc85c07b8d3c36c148a6b=1497930371; AJSTAT_ok_pages=74; AJSTAT_ok_times=3',
+}
+#使用代理服务器
+proxy_list=[
+    'http://***.***.***.***:****',
+    ]
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+second=[1,2,]
+sleep_second = random.choice(second)
+
+# print(soup)
+
+# im=Image.open("D:\\1.jpg")
+# im.rotate(45).show()# 图片旋转
+
+#设置代理
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--proxy-server=%s'%str(proxy_ip))
+driver = webdriver.Chrome(chrome_options=chrome_options)
+driver.get('*******')
+time.sleep(1)
+
+#点击刷新
+for i in range(1,4):
+    driver.execute_script('window.scrollTo(0,document.body.scrollHeight)')
+    time.sleep(1)
+
+soup=BeautifulSoup(driver.page_source,'lxml')
+articles=[]
+for article in soup.find_all(class_='item doc style-small-image style-content-middle'):
+    title=article.find(class_='doc-title').get_text()
+    source = article.find(class_='source').get_text()
+    comment = article.find(class_='comment-count').get_text()
+    link = 'http://www.yidianzixun.com' + article.get('href')
+    articles.append([title,source,comment,link])
+    
+print(len(articles))
+with open('yidianzixun.csv','w',newline='') as f:
+    writer=csv.writer(f)
+    writer.writerow(['标题','作者','评论数','地址'])
+    for row in articles:
+        writer.writerow(row)
