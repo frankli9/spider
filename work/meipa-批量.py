@@ -28,7 +28,6 @@ proxy_list=[
     # 'http://183.222.102.101:80',
     'http://183.222.102.94:80',
     'http://218.201.98.196:3128',
-    'http://120.52.21.132:8082',#被办的IP
     'http://121.40.199.105:80',
     'http://219.153.76.77:8080',
     # 'http://58.49.110.50:8080',#慢
@@ -54,7 +53,7 @@ from selenium import webdriver
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--proxy-server=%s'%str(proxy_ip))
 driver = webdriver.Chrome(chrome_options=chrome_options)
-driver.get('http://www.meipai.com/square/18?p=9')
+driver.get('?p=9')
 time.sleep(2)
 for i in range(1,6):
     driver.execute_script('window.scrollTo(0,document.body.scrollHeight)')
