@@ -1,0 +1,82 @@
+from bs4 import BeautifulSoup
+import requests
+import time
+from lxml import etree
+import random
+# import sys,importlib
+# importlib.reload(sys)
+
+#模拟浏览器登录
+headers={
+}
+#使用代理服务器
+proxy_list=[
+
+    ]
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+second=[1,2,]
+sleep_second = random.choice(second)
+
+
+# url='http://talk.oralpractice.com/article_14720.html'
+# wb_data=requests.get(url)
+# soup=BeautifulSoup(wb_data.text,'lxml')
+url='http://35.html'
+
+def get_item_info(url):
+    html = requests.get(url).content#.decode('utf-8')#.decode('gbk','ignore').encode('utf-8')
+    dom_tree = etree.HTML(html)
+    links=[]
+    titles=[]
+    time.sleep(2)
+
+    title= dom_tree.xpath('//*[@id="title"]/h1/text()')[0]
+    # words = dom_tree.xpath('//*[@id="content"]/p//text()')[::]    #1到34chinabillionaire's
+    words = dom_tree.xpath('//*[@id="content"]//text()')[::]  #
+    link = dom_tree.xpath('//*[@id="mp3"]/@href')[0]
+    links.append(link)
+    titles.append(title)
+    file_object_links = open('E:\\links.txt', 'a', encoding='utf-8')
+    for link in links:
+        file_object_links.write(link)
+        file_object_links.write('\n'+title+'\n')
+    print(links)
+    signs=['?',':','*','/','\r','\n','\t']
+
+
+    for title in titles:
+        for sign in signs:
+            if sign in title:
+                title= title.replace(sign, '')
+        file_object_links = open('E:\\%s.txt' % title, 'a', encoding='utf-8')
+        print(title)
+
+    for word in words:
+        file_object_links.write(word)
+        file_object_links.write('\n')
+    print(words)
+
+def get_links_from(page):
+    urls=[]
+    # list_view = '/index_{}.html'.format(str(page))
+    list_view='***Standard_{}.html'.format(str(page))
+    wb_data = requests.get(list_view,headers=headers,proxies=proxies)
+    soup=BeautifulSoup(wb_data.text,'lxml')
+    time.sleep(2)
+    for link in soup.select('div#list > ul > li > a'):
+        item_link='***'+link.get('href')
+        urls.append(item_link)
+        print(item_link)
+    print(urls)
+    print(len(urls))
+    for i in urls:
+        get_item_info(i)
+# get_links_from(36)
+
+for i in range(95,98):
+    get_links_from(i)
+    print('第 ',i,' 页采集完')
