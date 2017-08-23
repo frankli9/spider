@@ -1,0 +1,42 @@
+
+def get_links_from(list_view):
+    links=[]
+    # list_view='*****8?page={}'.format(str(page))
+    wb_data = requests.get(list_view,headers=headers,proxies=proxies)
+    soup=BeautifulSoup(wb_data.text,'lxml')
+    savePath='E:\\Chinese*****\\'
+    for item in soup.select('div.album_soundlist > ul > li > div > a.title'):
+        time.sleep(8)
+        number=item.get('href').split('/')[3]
+        # print(number)
+        title = item.get('title')
+        print(title)
+        link='http://www.ximalaya.com/tracks/{}.json'.format(number)
+
+        links.append(link)
+        #提取json
+        for link in links:
+            html = requests.get(link, headers=headers, proxies=proxies)
+            data = json.dumps(html.text)
+            data_2 = data.replace("\\", "")
+            data_3 = json.loads(re.search(".*?({.*}).*?", data_2, re.S).group(1))
+        print(len(data_3))
+
+        if len(data_3) == 1:
+            m4a_link = 'None'
+        else:
+            m4a_link = data_3['play_path']
+            print(m4a_link)
+        #判断路径新建文件夹，写入音频
+        if not os.path.isdir(savePath):
+            os.makedirs(savePath)
+        savem4a = savePath + title + u".m4a"
+        urllib.request.urlretrieve(m4a_link, savem4a)
+        #文本写入
+        file_object = open('*****m4a_link.txt', 'a', encoding='utf-8')
+        file_object.write(title+'\n')
+        file_object.write(str(len(data_3))+'\n')
+        file_object.write(m4a_link+'\n'+'\n')
+
+
+get_links_from(list_view)
