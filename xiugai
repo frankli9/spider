@@ -1,0 +1,134 @@
+from bs4 import BeautifulSoup
+import requests
+import time,re
+from lxml import etree
+import random
+# import sys,importlib
+# importlib.reload(sys)
+
+#模拟浏览器登录
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+    'Cookie':'__gads=ID=e90e92452442eef2:T=1497427490:S=ALNI_MZi4whQxIsWkk8QW0yrpnZ7MyTtfw; bdshare_firstime=1497599748961; PHPSESSID=jbnm2jk08p9fripuj44lu07427; yunsuo_session_verify=df3422073e655cde45e3dc9018fb2f94; Hm_lvt_adaf29565debc85c07b8d3c36c148a6b=1497604233,1497604246,1497604251,1497921441; Hm_lpvt_adaf29565debc85c07b8d3c36c148a6b=1497930371; AJSTAT_ok_pages=74; AJSTAT_ok_times=3',
+}
+#使用代理服务器
+proxy_list=[
+    'http://218.201.98.196:3128',  # 高匿
+    'http://121.40.199.105:80',  # 普匿,好的
+    'http://219.141.189.236:3128',  # 透明,好用的
+    'http://111.13.7.117:80',#好的
+    'http://111.13.2.138:80',
+    'http://111.13.2.131:80',
+    # 'http://42.202.130.246:3128',
+    'http://61.152.81.193:9100',
+    # 'http://139.196.176.18:9797',
+    # 'http://183.222.102.105:80',
+    # 'http://120.76.47.120:3128',
+    # 'http://183.222.102.94:80',
+    'http://183.222.102.99:80',
+    # 'http://101.200.44.5:8888',
+    'http://183.222.102.101:80',
+    'http://111.13.7.122:80',
+    'http://61.130.97.212:8099',
+    # 'http://183.222.102.104:8080',
+    'http://58.49.110.50:8080',
+    # 'http://113.200.214.164:9999',
+    # 'http://61.163.39.70:9999',
+    'http://122.72.32.88:80',
+    'http://122.72.32.75:80',
+    # 'http://122.72.32.73:80',
+    ]
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+second=[1,2,]
+sleep_second = random.choice(second)
+
+
+# url='http://talk.oralpractice.com/article_14720.html'
+# wb_data=requests.get(url)
+# soup=BeautifulSoup(wb_data.text,'lxml')
+url='http://www.kekenet.com/menu/201209/198051.shtml'
+#
+def get_item_info(url):
+    # html = requests.get(url).content.decode('utf-8')#.decode('gbk','ignore').encode('utf-8')
+    # dom_tree = etree.HTML(html)
+    # links=[]
+    # titles=[]
+    # time.sleep(2)
+    #
+    # title= dom_tree.xpath('//h1[@id="nrtitle"]//text()')[0]
+    # # print(title)
+    # words = dom_tree.xpath('//div[@class="qh_en"]//text()')[::]
+    #
+    # link=dom_tree.xpath('//object[@classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"]/param[6]')
+    # print(html)
+    html=requests.get(url, headers=headers, proxies=proxies)
+    # s = html.content.decode()
+    # S = s.decode('GBK', 'ignore')
+    soup=BeautifulSoup(html.text,'lxml').decode('gbk')
+    print(soup)
+
+    http: // www.kekenet.com / menu / 13659 / List_5.shtml
+
+
+    # link=re
+    # print(words)
+    # link = dom_tree.xpath('//*[@id="mp3"]/@href')[0]
+    # links.append(link)
+    # titles.append(title)
+    # file_object_links = open('E:\\Chinese\\缪姐项目\\links.txt', 'a', encoding='utf-8')
+    # for link in links:
+    #     file_object_links.write(link)
+    #     file_object_links.write('\n'+title+'\n')
+    # print(links)
+    # signs=['?',':','*','/','\r','\n','\t']
+    #
+    #
+    # for title in titles:
+    #     for sign in signs:
+    #         if sign in title:
+    #             title= title.replace(sign, '')
+    #     file_object_links = open('E:\\Chinese\\缪姐项目\\%s.txt' % title, 'a', encoding='utf-8')
+    #     print(title)
+    #
+    # for word in words:
+    #     file_object_links.write(word)
+    #     file_object_links.write('\n')
+    # print(words)
+    # print(links)
+    # print(links)
+
+
+
+get_item_info(url)
+
+#
+#
+# def get_links_from(page):
+#     urls=[]
+#     # list_view = 'http://www.tingvoa.com/oral/meitianyikeyingyukouyu365/index_{}.html'.format(str(page))
+#     list_view='http://www.kekenet.com/menu/13659/List_{}.shtml'.format(str(page))
+#     wb_data = requests.get(list_view,headers=headers,proxies=proxies)
+#     soup=BeautifulSoup(wb_data.text,'lxml')
+#     time.sleep(2)
+#     for link in soup.select('ul#menu-list > li > h2 > a'):
+#         item_link=link.get('href')
+#         urls.append(item_link)
+#         print(item_link)
+#     print(urls)
+#     print(len(urls))
+    # for i in urls:
+    #     get_item_info(i)
+# get_links_from(2)
+
+# for i in range(95,98):
+#     get_links_from(i)
+#     print('第 ',i,' 页采集完')
