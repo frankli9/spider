@@ -1,0 +1,149 @@
+#
+# for i in range(72,74)[::-1]:
+#     print(i)
+
+from bs4 import BeautifulSoup
+import requests,time,random,os,re,urllib.request,multiprocessing
+from lxml import etree
+from selenium.webdriver.common.keys import Keys
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+# import sys
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
+
+
+
+# import sys,importlib
+# importlib.reload(sys)
+
+#模拟浏览器登录
+headers={
+}
+#使用代理服务器
+proxy_list=[
+
+    ]
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+second=[2,3,4,5,6]
+sleep_second = random.choice(second)
+
+# url = 'http://www..shtml'
+
+
+def get_item_info(url):
+
+    savePath = '\\可可英语\\'
+    if not os.path.isdir(savePath):
+        os.makedirs(savePath)
+    #urllib.request的方式使用正则表达式
+    # res = urllib.request.urlopen(url).read()
+    # content = res.decode('utf8')
+
+    #requests的方式使用正则表达式
+    html = requests.get(url, headers=headers, proxies=proxies)#解决网页输出乱码
+    html.encoding = 'utf-8'
+    html_text = html.text
+    soup = BeautifulSoup(html.text, 'lxml')
+
+    time.sleep(sleep_second)
+    print(8)
+
+    # print(content.text)
+    # 通用的正则表达式
+    pattern = re.compile('Sound/[^ ]*\.mp3')
+    link = re.findall(pattern, html_text)[0]
+
+    title = soup.select('div.e_title > h1#nrtitle')[0].get_text()
+    print(title)
+
+    signs = ['?', ':', '*', '/', '\r', '\n', '\t']
+    for sign in signs:
+        if sign in title:
+            title = title.replace(sign, '')
+            print(title)
+    mp3_link = '.com/' + link
+    print(mp3_link)
+    savemp3 = savePath + str(title) + u".mp3"
+    urllib.request.urlretrieve(mp3_link, savemp3)
+
+    file_object_links = open('{}.txt'.format(str(title)),'a', encoding='utf-8')
+    for article in soup.find_all(class_='qh_en'):
+        text = article.get_text()
+        file_object_links.write(text + '\n')
+        print(text)
+
+
+# get_item_info(url)
+
+
+def get_links_and_get_info(page):
+    urls=[]
+    # list_view = '{}.html'.format(str(page))
+    list_view='http://{}.shtml'.format(str(page))
+    wb_data = requests.get(list_view,headers=headers,proxies=proxies)
+    soup=BeautifulSoup(wb_data.text,'lxml')
+    # print(soup)
+    for link in soup.select('li > h2 > a'):
+        item_link=link.get('href')
+        urls.append(item_link)
+        print(item_link)
+
+    # print(urls)
+    # print(len(urls))
+
+    for url in urls:
+        get_item_info(url)
+
+# get_links_and_get_info(70)
+
+# 多线程
+if __name__=='__main__':
+    pool=multiprocessing.Pool()
+    pool.map(get_links_and_get_info,[i for i in range(45, 50)[::-1]])#i for i in range(55, 60)[::-1]
+
+
+# for i in range(66, 68)[::-1]:  # for i in range(72,74)#73,72
+#     get_links_and_get_info(i)
+#     print('第 ', i, ' 页采集完')
+
+
+# from bs4 import BeautifulSoup
+#
+# import re,requests,random,time
+#
+# from selenium.webdriver.common.keys import Keys
+# from selenium import webdriver
+#
+# headers={
+ }
+# #使用代理服务器
+# proxy_list=[
+
+#     ]
+# proxy_ip = random.choice(proxy_list)
+# proxies = {'http':proxy_ip}
+# print(proxy_ip)
+#
+# url='http:.shtml'
+#
+# chrome_options = webdriver.ChromeOptions()
+# chrome_options.add_argument('--proxy-server=%s' % str(proxy_ip))
+# driver = webdriver.Chrome(chrome_options=chrome_options)
+# driver.get(url)
+# # time.sleep(1)
+# # html=download(url)
+# page_source=driver.page_source
+# print(page_source)
+# # soup = BeautifulSoup(driver.page_source, 'lxml')
+# mp3_link=re.findall('/[^ ]*\.mp3',driver.page_source)[0]
+# print(mp3_link)
+
+
