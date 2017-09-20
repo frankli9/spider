@@ -1,0 +1,281 @@
+from bs4 import BeautifulSoup
+import requests,time,random,os,re,urllib.request,json,multiprocessing
+from lxml import etree
+from selenium.webdriver.common.keys import Keys
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+    'Cookie':'__gads=ID=e90e92452442eef2:T=1497427490:S=ALNI_MZi4whQxIsWkk8QW0yrpnZ7MyTtfw; bdshare_firstime=1497599748961; PHPSESSID=jbnm2jk08p9fripuj44lu07427; yunsuo_session_verify=df3422073e655cde45e3dc9018fb2f94; Hm_lvt_adaf29565debc85c07b8d3c36c148a6b=1497604233,1497604246,1497604251,1497921441; Hm_lpvt_adaf29565debc85c07b8d3c36c148a6b=1497930371; AJSTAT_ok_pages=74; AJSTAT_ok_times=3',
+}
+
+proxy_list=[
+    # 'http://111.13.111.184:80',      #好的，快
+    # 'http://111.13.7.118:80',        #好的，快
+    # 'http://120.132.71.212:80',      #好的，快
+    # 'http://121.201.21.170:3128',      #没通
+    # 'http://219.149.46.151:3129',      #好的
+    # 'http://183.62.196.10:3128',       #速度一般
+    # 'http://124.206.133.219:3128',   #好的，快
+    # 'http://123.59.51.130:8080',   #慢
+    # 'http://139.196.12.124:8088',      #好的,selenium快
+    # 'http://61.160.208.222:8080',   #selenium 速度一般，无返回
+    # 'http://222.73.68.144:8090',       #selenium测试失败
+    # 'http://52.80.53.96:33862',      #好的selenium,有时无返回
+    # 'http://111.13.109.27:80',     #好的，selenium快
+    # 'http://117.78.35.194:3128',       #好的，速度一般
+    # 'http://113.128.91.170:48888',   #慢
+    # 'http://202.202.90.20:8080',      #selenium初期测试好的
+    # 'http://123.7.38.31:9999',     #selenium慢
+    'http://106.14.51.145:8118',        #selenium 快
+    # 'http://54.223.223.220:33862',  #selenium 速度一般
+    # 'http://121.40.199.105:80',     #good
+    # 'http://124.238.235.135:81',    #好的，selenium慢
+    # 'http://113.140.43.136:80',    #selenium 慢
+    # 'http://122.192.66.50:808',  #selenium，慢
+    # 'http://220.249.185.178:9999',    #好的，快
+    # 'http://122.72.99.4:80',#selenium 没反应
+    # 'http://121.42.57.185:3128',    #没反应
+    # 'http://54.222.142.222:33862',  #selenium 快
+    # 'http://54.222.156.124:33862',   #快，不知是否稳定
+    # 'http://183.240.87.229:8080',     #好的，速度一般
+    # 'http://122.49.35.168:33128',     #好的，快
+    # 'http://221.10.126.191:2227',      #selenium
+    # 'http://59.55.140.91:3128',       #好的，速度一般
+    ]
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+
+# url='/{}.html'.format(name)
+
+def diming(name):
+
+    url = '/{}.html'.format(name)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--proxy-server=%s' % str(proxy_ip))
+    driver = webdriver.Chrome(chrome_options=chrome_options)
+    driver.get(url)
+    driver.implicitly_wait(1)#隐式等待，然后执行下面的命令
+
+
+    soup = BeautifulSoup(driver.page_source, 'lxml')
+    # html=requests.get(url,headers=headers,proxies=proxies,)
+    # html.encoding='gbk'
+    # print(soup)
+    # print(soup)
+
+    link = soup.select('#page_left > div:nth-of-type(5) > table > tbody > tr > td > div > a.blue')
+    # print(link)
+    zhen_jiedao_names =soup.select('#page_left > div:nth-of-type(5) > table > tbody > tr > td > div > a.blue')
+
+    for zhen_jiedao_name in zhen_jiedao_names[74::]:
+        zhen_name=zhen_jiedao_name.get_text()
+        # time.sleep(1)
+        if '镇' in zhen_name:
+            zhen_url=zhen_jiedao_name.get('href')
+            finally_zhen_url='http://'+zhen_url
+            # cun_html = requests.get(finally_zhen_url, headers=headers, proxies=proxies)
+            # driver.get(finally_zhen_url)
+            chrome_options = webdriver.ChromeOptions()
+            chrome_options.add_argument('--proxy-server=%s' % str(proxy_ip))
+            driver_1 = webdriver.Chrome(chrome_options=chrome_options)
+            driver_1.get(finally_zhen_url)
+            driver_1.implicitly_wait(1)
+
+            # cun_html.encoding = 'gbk'
+            soup_zhen=BeautifulSoup(driver_1.page_source,'lxml')
+            # print(soup_zhen)
+            time.sleep(3)
+            cun_name_all=soup_zhen.select('#page_left > div:nth-of-type(5) > table > tbody > tr > td > strong > a')
+            title = soup_zhen.select('#page_left > h1')[0].text
+            driver_1.close()
+            print(cun_name_all)
+            for cun_name in cun_name_all:
+                cun_name_finally=title+cun_name.get_text()
+                file_object = open('E:\\{}.txt'.format(name), 'a',encoding='utf-8')
+                file_object.write(cun_name_finally+'\n')
+                print(cun_name_finally)
+
+
+
+diming('shaoguanshi')
+
+
+            # print(finally_zhen_url)
+
+
+
+
+
+    # for i in link:
+    #     time.sleep(1)
+    #     detail='http://'+i.get('href')
+    #     print(detail)
+    #
+    #     if
+    #     html_detail=requests.get(detail,headers=headers,proxies=proxies)
+    #     html_detail.encoding = 'gbk'
+    #     soup2=BeautifulSoup(html_detail.text,'lxml')
+    #     title=soup2.select('#page_left > h1')[0].text
+
+        # print(title)
+    #     jingdianes=soup2.select('#page_left > div:nth-of-type(10) > div > li')
+    #     #
+    #     # print(jingdianes)
+    #     # print(title,jingdianes)
+    #     for jingdian in jingdianes:
+    #         jiedao_jingdian=title+jingdian.get_text()
+    #         file_object = open('E:\\{}.txt'.format(name), 'a',encoding='utf-8')
+    #         file_object.write(jiedao_jingdian+'\n')
+    #         print(jiedao_jingdian)
+    #         file_object.close()
+
+
+
+
+# if __name__=='__main__':
+#     pool=multiprocessing.Pool()
+#     diming('guangzhoushi')
+
+
+    # link=soup.find_all("a", attrs={"class": "blue"})
+    # for i in link:
+    #     print(i.get('href'))
+    # print(link)
+
+
+    # for i in diming_detail:
+    #     time.sleep(1)
+    #     detail='http:/' + i
+    #     html_detail=requests.get(detail,headers=headers,proxies=proxies)
+    #     html_detail.encoding = 'gbk'
+    #     soup=BeautifulSoup(html_detail.text,'lxml')
+    #     title=soup.select('#page_left > h1').text
+    #     print(html_detail)
+    #     print(title)
+
+
+
+
+
+    # diming=page.xpath('//*[@id="page_left"]/div[5]/table/tbody/tr/td/strong/a//text()')
+    # title = page.xpath('//h1/text()')[0]
+    # file_object = open('E:\\{}.txt'.format(title),'a', encoding='utf-8')
+    # for i in diming:
+    #     file_object.write(i+'\n')
+    #     print(i)
+    # file_object.close()
+    #
+    # # for i in diming:
+    # #     print(i)
+    # print(html)
+    # print(page)
+    # print(diming)
+    # print(title)
+    # diming_name=page.xpath('//*[@id="page_left"]/div[5]/table/tbody/tr/td/strong/a/@href')
+
+
+
+
+
+# soup = BeautifulSoup(driver.page_source, 'lxml')
+# html=requests.get(url,headers=headers,proxies=proxies,)
+# html.encoding='gbk'
+# soup=BeautifulSoup(html.text,'lxml')
+
+# html =  driver.page_source    #requests.get(url,headers=headers,proxies=proxies).content.decode('utf-8')#,headers=headers,proxies=proxies
+
+
+# html = requests.get(url,headers=headers,proxies=proxies,)# 最基本的GET请求
+# html.encoding='gbk'
+# soup=BeautifulSoup(html.text,'lxml')
+# print(soup)
+# for diming in soup.select('#page_left > div:nth-of-type(6) > table > tbody > tr > td > strong > a'):
+#
+#     print(diming)
+
+# r.encoding = 'gbk'
+# r = r.text
+# dom_tree = etree.HTML(r)
+# print(dom_tree)
+# for diming in dom_tree.xpath('//*[@id="page_left"]/div[6]/table/tbody/tr/td/strong/a/text()'):
+#     print(diming.get_text())
+
+
+# for shiming_url in dom_tree.xpath('/html/body/table[3]/tbody/tr/td[1]/div/b/a'):
+#     print(shiming_url.strip('/'))
+#
+# for diming_url in dom_tree.xpath('//*[@id="list110"]/a/@herf'):
+#     print(diming_url)
+    # print(diming_url.split('/')[1])
+
+
+# for shiming in soup.select('td > div > b > a'):
+#      shiming_finally=shiming.get_text().strip('地名')
+#      # print(shiming_finally)
+#      for diming in soup.select('body > table:nth-of-type(3) > tbody > tr > td > div > a'):
+#         diming_finally=diming.get_text()
+#         shi_diming = shiming_finally + diming_finally
+#         print(shi_diming)
+
+
+# for diming in soup.select('body > table:nth-of-type(3) > tbody > tr > td > div > a'):
+#     diming_finally=diming.get_text()
+#
+#     # print(diming)
+#
+#     for shiming in soup.select('td > div > b > a'):
+#         shiming_finally=shiming.get_text().strip('地名')
+#         shi_diming = shiming_finally + diming_finally
+#         print(shi_diming)
+
+
+# html=requests.get(url,headers=headers,proxies=proxies,)
+# html.encoding='gbk'
+# soup=BeautifulSoup(html.text,'lxml')
+# # for shiming in soup.select('td > div > b > a'):
+# #     shiming_finally=shiming.get_text().strip('地名')
+# for diming in soup.select('body > table:nth-of-type(3) > tbody > tr > td > div > a'):
+#     diming_finally=diming.get_text()
+#     # shi_diming = shiming_finally + diming_finally
+#
+#     print(diming)
+# html = requests.get(url,headers=headers,proxies=proxies).content.decode('gbk')#,headers=headers,proxies=proxies
+# dom_tree = etree.HTML(html)
+# print(dom_tree)
+# shiming = dom_tree.xpath('/html/body/table[3]/tbody/tr/td[1]/div/b/a/text()')
+# print(html)
+# diming = 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
