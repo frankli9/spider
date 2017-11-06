@@ -1,0 +1,39 @@
+import requests,random,json
+from bs4 import BeautifulSoup
+
+headers={
+    'User-Agent':'ozilla/5.0 (Windows NT 6.1; WOW64)',
+    'Accept':'text/html,application/xhtml+xml,application/xml;',
+
+
+}
+
+proxy_list=[
+    ]
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+
+form_data={
+
+}
+
+def main():
+    print(proxies)
+    url='http'
+    html=requests.post(url,data=form_data,proxies=proxies,headers=headers).json()
+    # print(html)
+    positions=html['content']['position']['result']
+    # print(positions)
+    line=json.dumps(positions,ensure_ascii=False)
+    with open('D:\\lagou.json','w+',encoding='utf-8') as fp:
+        fp.write(line)
+    print(line)
+
+    # for position in positions:
+    #     print('-'*50)
+    #     print(position)
+
+
+if __name__ == '__main__':
+    main()
+
