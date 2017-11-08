@@ -1,0 +1,43 @@
+import requests
+from bs4 import BeautifulSoup
+
+def get_html(url):
+    try:
+        r=requests.get(url,timeout=30)
+        r.raise_for_status()
+        r.encoding=r.apparent_encoding
+        return r.text
+    except:
+        return "Error"
+
+def print_result(url):
+
+    html=get_html(url)
+    soup=BeautifulSoup(html,'lxml')
+    match_list=soup.find_all('div',attrs={'class':'matchmain bisai_qukuai'})
+    for match in match_list:
+        time=match.find('div',attrs={'class':'whenm'}).text.strip()
+        teamname=match.find_all('span',attrs={'class':'team_name'})
+
+        # print(teamname[0].string)
+
+
+        if teamname[0].string[0:3]=='php':
+            team1_name="暂无队名"
+        else:
+            team1_name=teamname[0].string
+
+        team1_support_level = match.find('span', class_='team_number_green').string
+
+        team2_name = teamname[1].string
+        team2_support_level = match.find('span', class_='team_number_red').string
+
+        print('比赛时间：{}，\n 队伍一：{}      胜率 {}\n 队伍二：{}      胜率 {} \n'.format(time, team1_name, team1_support_level,team2_name, team2_support_level))
+
+def main():
+    url = 'http://dota2bocai.com/match'
+    print_result(url)
+
+if __name__ == '__main__':
+    main()
+
