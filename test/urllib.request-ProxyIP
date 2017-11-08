@@ -4,23 +4,17 @@ import pandas as pd
 import numpy as np
 
 
-url = '***'
+url = 'http://study.163.com/p/search/studycourse.json'
 
-# iplist = ['http://106.14.51.145:8118','http://219.135.164.245:3128']
-# random_ip=random.choice(iplist)
-# print(random_ip)
-# proxy_support = urllib.request.ProxyHandler({'http':random_ip})
-# opener = urllib.request.build_opener(proxy_support,urllib.request.ProxyHandler)
-# urllib.request.install_opener(opener)
-# data=urllib.request.urlopen(url).read().decode('utf-8','ignore')
+
 #
 # print(data)
 
 headers = {
     'Content-Type': 'application/json',
-    'edu-script-token': '*****',
-    'Host': '***',
-    'Origin': 'http:****',
+    'edu-script-token': 'd5cba8e3d4b44d01ba70d89cdbbebb90',
+    'Host': 'study.163.com',
+    'Origin': 'http://study.163.com',
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36',
 
 }
@@ -49,11 +43,24 @@ fullinfo = []
 
 def GetCourses(url, headers=headers, Payload=Payloads):
     fullinfo = []
+    iplist = ['http://106.14.51.145:8118', 'http://219.135.164.245:3128']
+    random_ip = random.choice(iplist)
+    print(random_ip)
+    proxy_support = urllib.request.ProxyHandler({'http': random_ip})
+    opener = urllib.request.build_opener(proxy_support, urllib.request.ProxyHandler)
+    urllib.request.install_opener(opener)
+
+    # data = urllib.request.urlopen(url).read().decode('utf-8', 'ignore')
     for i in range(1,17):
         Payload['pageIndex'] = i
         Payload['relativeOffset'] = 50 * i - 50
-        content = Request(url, data=json.dumps(Payload).encode(encoding='utf-8'),headers=headers)
-        response = json.loads(urlopen(content).read().decode('UTF-8'))
+
+        content = Request(url, data=json.dumps(Payload).encode(encoding='utf-8'), headers=headers)
+        response = json.loads(urllib.request.urlopen(content).read().decode('UTF-8'))
+
+
+        # content = Request(url, data=json.dumps(Payload).encode(encoding='utf-8'),headers=headers)
+        # response = json.loads(urlopen(content).read().decode('UTF-8'))
         fullinfo = fullinfo + response['result']['list']
         print("第{}页已抓取完毕".format(i))
         time.sleep(2)
