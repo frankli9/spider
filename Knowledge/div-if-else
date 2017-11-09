@@ -1,0 +1,28 @@
+import urllib.request
+from bs4 import BeautifulSoup
+import pymysql
+
+url='https://douban'
+content=urllib.request.urlopen(url).read()
+# print(content.decode('utf-8'))
+
+soup=BeautifulSoup(content,'lxml')
+# print(soup.prettify())
+
+for content in soup.select('.info'):
+    title = content.select('.title')[0].text
+    author = content.select('.author-item')[0].text
+    price = content.select('.price-tag')[0].tex
+    category = content.select('.category')[0].text
+    if content.select('.rating-average'):
+        rating = content.select('.rating-average')[0].text
+    else:
+        rating = '无评分'
+    if content.select('.ratings-link'):
+        eveluate_nums = content.select('.ratings-link')[0].text[:-3]
+    else:
+        eveluate_nums = '还没有人评价'
+    desc = content.select('.article-desc-brief')[0].text
+
+    print(title,author,price,category,rating,eveluate_nums,desc)
+
