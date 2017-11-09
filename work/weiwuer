@@ -1,0 +1,147 @@
+from bs4 import BeautifulSoup
+import re, os, requests, random, time, urllib.request, csv,json
+from lxml import etree
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from selenium import webdriver
+
+# 模拟浏览器登录
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'zh-CN,zh;q=0.8',
+    'Cache-Control': 'max-age=0',
+    'Connection': 'keep-alive',
+    'Cookie': '__gads=ID=e90e92452442eef2:T=1497427490:S=ALNI_MZi4whQxIsWkk8QW0yrpnZ7MyTtfw; bdshare_firstime=1497599748961; PHPSESSID=jbnm2jk08p9fripuj44lu07427; yunsuo_session_verify=df3422073e655cde45e3dc9018fb2f94; Hm_lvt_adaf29565debc85c07b8d3c36c148a6b=1497604233,1497604246,1497604251,1497921441; Hm_lpvt_adaf29565debc85c07b8d3c36c148a6b=1497930371; AJSTAT_ok_pages=74; AJSTAT_ok_times=3',
+}
+# 使用代理服务器
+proxy_list = [
+    '61.136.163.245:8103',
+    '211.138.60.25:80',
+    # '183.136.218.253:80',#
+    '183.2.208.35:80',
+    '58.16.42.112:8080',
+    '117.34.72.251:8082',
+    '61.158.187.157:8080',
+    '123.147.165.143:8080',
+    '49.119.164.175:80',#
+    '111.56.5.42:80',
+    # '218.56.132.157:8080',#慢
+
+    # '183.30.197.10:9797',#慢
+    '42.245.252.35:80',
+    # '175.171.108.227:53281', #慢
+    '120.194.18.90:81',
+    '182.149.158.179:9000',
+    # '61.152.230.26:8080',#慢
+    '117.68.193.87:808',#
+]
+proxy_ip = random.choice(proxy_list)
+proxies = {'http': proxy_ip}
+print(proxy_ip)
+
+second = [1, 2, ]
+sleep_second = random.choice(second)
+
+# print(soup)
+
+# im=Image.open("D:\\1.jpg")
+# im.rotate(45).show()# 图片旋转
+
+
+url='http://www.'
+# 设置代理
+# chrome_options = webdriver.ChromeOptions()
+# chrome_options.add_argument('--proxy-server=%s' % str(proxy_ip))
+# driver = webdriver.Chrome(chrome_options=chrome_options)
+# driver.get('http://www.mzywfy.org.cn/translate.jsp')
+# time.sleep(2)
+# Select(driver.find_element_by_id("output_l")).select_by_value("uy")
+# 读取文件
+
+
+
+with open('D:\\python爬虫\\selenium\\talk.txt',encoding='utf-8') as f:
+    for i in range(1,278):
+        line=f.readline()
+        form_data = {
+            'src_text': line,
+            'from':'zh',
+            'to':'uy',
+            'url':'2'
+}
+        time.sleep(2)
+        html = requests.post(url,data=form_data,proxies=proxies,headers=headers).json()
+        line_after=html['tgt_text']
+        line_after_strip=line_after.strip('<br>')
+
+        with open('D:\\python爬虫\\selenium\\talk_after.txt','a+',encoding='utf-8',) as fafter:
+            fafter.write(line_after_strip+'\n')
+            print(i,line_after_strip)
+
+
+# print(html)
+# print(type(html))
+
+# print(line)
+# driver.find_element_by_id('source').send_keys(line)
+# driver.find_element_by_id('translate').click()
+# html = requests.get(url).content
+# dom_tree = etree.HTML(html)
+# line_after = dom_tree.xpath('//*[@id="result_content"]//text()')
+# driver.find_element_by_id('clear').click()
+
+# html = requests.post(url,headers=headers).json()
+# print(html)
+# print(type(html))
+        # page_positions = html['content']['positionResult']['result']
+        # print(line_after)
+
+        # req=requests.get(url,proxies=proxies,headers=headers)
+        # soup=BeautifulSoup(req.text,'lxml')
+        # line_after=soup.select('')
+
+
+        # time.sleep(2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 点击刷新
+# for i in range(1, 4):
+#     driver.execute_script('window.scrollTo(0,document.body.scrollHeight)')
+#     time.sleep(1)
+#
+# soup = BeautifulSoup(driver.page_source, 'lxml')
+# articles = []
+# for article in soup.find_all(class_='item doc style-small-image style-content-middle'):
+#     title = article.find(class_='doc-title').get_text()
+#     source = article.find(class_='source').get_text()
+#     comment = article.find(class_='comment-count').get_text()
+#     link = 'http://www.yidianzixun.com' + article.get('href')
+#     articles.append([title, source, comment, link])
+#
+# print(len(articles))
+# with open('yidianzixun.csv', 'w', newline='') as f:
+#     writer = csv.writer(f)
+#     writer.writerow(['标题', '作者', '评论数', '地址'])
+#     for row in articles:
+#         writer.writerow(row)
