@@ -1,0 +1,20 @@
+import re
+import urllib.request
+
+f=open("Pic.txt",'r',encoding='utf-8')
+Content=f.read()
+
+f.close()
+
+
+pic_url2 = re.findall('img data-original="(.*?)" src',Content)
+
+i = 0
+for url in pic_url2:
+    f = urllib.request.urlopen(url)
+    data=f.read()
+
+    with open("E:\\pachong\\learn-spider\\"+str(i)+'.jpg','wb') as fp:
+
+        fp.write(data)
+        i+=1
