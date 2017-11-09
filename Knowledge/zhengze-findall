@@ -1,0 +1,72 @@
+转自：https://mp.weixin.qq.com/s?__biz=MzIxNjA2ODUzNg==&mid=2651435876&idx=1&sn=8014f694c1c2709bb48cdf398aba9320&chksm=8c73abb3bb0422a512b08c118d05f83657a364f15f918d7eb1f0c14d36a64402d7d858b8f86a&scene=21#wechat_redirect
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import time
+import re
+
+# 设置头文件，用于反爬虫
+headers = {'Accept':'*/*','Accept-Encoding':'gzip, deflate, br',
+            'Accept-Language':'zh-CN,zh;q=0.8',    
+            'Connection':'keep-alive',    
+            'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.79 Safari/537.36'}
+            
+# 根据豆瓣主页抓取各个电影的类型ID
+home = 'https://movie.douban.com/chart'
+res = requests.get(home, headers = headers).text
+soup = BeautifulSoup(res,'html.parser')
+
+# 通过正则表达式获取每个电影类型的id
+
+type_id = re.findall('type=(.*?)&amp', 
+                     str(soup.findAll('div',{'class':'types'})[0]))
+                     
+# ==================== 步骤二 根据异步存储的链接规律，生成所有的抓取链接 ==================== #
+
+# https://movie.douban.com/j/chart/top_list?type=5&interval_id=100%3A90&action=&start=0&limit=20
+# 根据url的规律，生成抓取数据的目标url
+urls = []
+for num in type_id:    
+    for i in range(100,-10,-10):
+        urls.append('https://movie.douban.com/j/chart/top_list?type='+num+'&interval_id='+str(i)+'%3A'+str(i-10)+'&action=&start=0&limit=100')
+
+# ==================== 步骤三 抓取电影信息 ==================== #
+
+# 构建空列表，用于存储爬虫的数据信息
+title = []
+types = []
+regions = []
+date = []
+actor_count = []
+score = []
+vote_counts = []
+actors = []
+
+# 通过for循环抓取每一页电影的信息
+for url in urls:
+    res = requests.get(url, headers = headers).text    
+
+    # 通过正则表达式完成数据的扣取
+    title.extend(re.findall('"title":"(.*?)",', res))
+    types.extend(re.findall('"types":\[(.*?)\],', res))
+    regions.extend(re.findall('"regions":\[(.*?)\],', res))
+    date.extend(re.findall('"release_date":"(.*?)",', res))
+    actor_count.extend(re.findall('"actor_count":(.*?),', res))
+    score.extend(re.findall('"score":"(.*?)",', res))
+    vote_counts.extend(re.findall('"vote_count":(.*?),', res))
+    actors.extend(re.findall('"actors":\[(.*?)\],', res))    
+    
+    # 每隔3秒抓取一页数据
+    time.sleep(3)
+    
+# 将抓取下来的数据存放到字典中    
+data_dict = {'title':title,'types':types,'regions':regions, 
+            'date':date,'actor_count':actor_count,'score':score, 
+            'vote_counts':vote_counts,'actors':actors}
+            
+# ==================== 步骤四 数据的存储 ==================== #     
+
+# 将数据存储为数据框结构
+df = pd.DataFrame(data_dict)
+# 数据导出
+df.to_excel('films_info.xlsx', index = False)
