@@ -1,19 +1,30 @@
 转自：https://zhuanlan.zhihu.com/p/26701898
 
 
-re.search(pattern, string, flags=0)在一个字符串中搜索匹配正则表达式的第一个位置返回match对象? pattern : 正则表达式的字符串或原生字符串表示? string : 待匹配字符串? flags : 正则表达式使用时的控制标记
+re.search(pattern, string, flags=0)在一个字符串中搜索匹配正则表达式的第一个位置返回match对象? 
+pattern : 正则表达式的字符串或原生字符串表示? 
+string : 待匹配字符串? 
+flags : 正则表达式使用时的控制标记
+
+search一般与group(n)搭配使用
 
 str1='hello , world ,life is short ,use Python .WHAT? 'a=re.search(r'\w+',str1)print(a.group())  # hello
 
-常用的第三个参数 flags：re.IGNORECASE：忽略大小写，同 re.I。
+常用的第三个参数 
+flags：
+re.IGNORECASE：忽略大小写，同 re.I。
 re.MULTILINE：多行模式，改变和$的行为，同re.M。
 re.DOTALL：点任意匹配模式，让’.’可以匹配包括’\n’在内的任字符，同 re.S。
+
 我们来使用一下控制标记试试：
 str1 = 'hello , world ,life is short ,use
 b = re.search(r'w.+D',str1,re.I)
 print(b.group())  #  world
 
-re.findall(pattern, string, flags=0)搜索字符串，以列表类型返回全部能匹配的子串∙ pattern : 正则表达式的字符串或原生字符串表示∙ string : 待匹配字符串∙ flags : 正则表达式使用时的控制标记'
+re.findall(pattern, string, flags=0)搜索字符串，以列表类型返回全部能匹配的子串
+∙ pattern : 正则表达式的字符串或原生字符串表示
+∙ string : 待匹配字符串
+∙ flags : 正则表达式使用时的控制标记'
 
 c=re.findall(r'\w+',str1)
 print(c)
