@@ -1,0 +1,8 @@
+import requests
+import io
+import sys
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='gb18030')
+response = requests.get("http://*****/")
+s=response.content.decode()
+# S=s.decode('GBK','ignore')
+print(s)
