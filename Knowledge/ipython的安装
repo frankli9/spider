@@ -1,0 +1,9 @@
+ipython2和ipython3的安装
+
+ipython2需要Microsoft Visual C++ Compiler for Python 2.7
+
+ipython2安装包下载地址：https://pypi.python.org/pypi/ipython
+
+
+
+安装后修改pyth路径即可
