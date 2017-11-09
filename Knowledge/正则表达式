@@ -1,0 +1,40 @@
+转自：https://mp.weixin.qq.com/s?__biz=MzIxNjA2ODUzNg==&mid=403577828&idx=1&sn=5f5d97d5d3813a0ec3cced2a9ee18e10&scene=21#wechat_redirect
+
+点号：匹配除“\r\n”之外的任何单个字符，可以理解为一个占位符
+举例：
+x = '1q2wwyxliuwyx3e4rwyxshunwyx1q2wwyxxiangwyx3e4r'
+re.findall('wyx.',x)
+Out[1]: ['wyxl', 'wyx3', 'wyxs', 'wyx1', 'wyxx', 'wyx3']
+返回"wyx"和紧跟其后的第一个字符
+
+re.findall('wyx...',x)
+Out[2]: ['wyxliu', 'wyx3e4', 'wyxshu', 'wyx1q2', 'wyxxia', 'wyx3e4']
+返回"wyx"和紧跟其后的第一第二个字符
+所以可以将点号(.)理解为一个占位符，而且这个占位符可以代表一切字符。
+
+星号：匹配前一个字符任意次
+x = '1q2wwyxliuwyx3e4rwyxshunwyx1q2wwyxxiangwyx3e4r'
+re.findall('wyx*',x)
+Out[3]: ['wyx', 'wyx', 'wyx', 'wyx', 'wyxx', 'wyx']
+星号(*)前一个字符为x，所以返回结果中可以找到x的任意次，x字符串中有两个连续的x，所以返回结果中第5个元素就会有两个x。
+
+问号：匹配前一个字符0次或1次，与星号的不同在于其最多匹配一次。
+x = '1q2wwyxliuwyx3e4rwyxshunwyx1q2wwyxxiangwyx3e4r'
+re.findall('wyx?',x)
+Out[4]: ['wyx', 'wyx', 'wyx', 'wyx', 'wyx', 'wyx']
+结果显示，返回结果的第五个元素仅含有一个x。
+
+点星组合(.*)：贪婪算法，尽可能多的匹配数据
+re.findall('wyx.*wyx',x)
+Out[5]: ['wyxliuwyx3e4rwyxshunwyx1q2wwyxxiangwyx']
+从返回的结果就可以理解“贪婪”的概念了，结果一次性返回wyx与wyx之间的所有内容。
+
+点星问组合(.*?)：非贪婪算法，尽可能少的匹配数据
+re.findall('wyx.*?wyx',x)
+Out[6]: ['wyxliuwyx', 'wyxshunwyx', 'wyxxiangwyx']
+而这次的返回结果就完全不同于上面的结果，它尽可能少的返回满足正则表达式的结果，从而将1大串切割为3小串。
+
+圆括号()：返回所需信息
+re.findall('wyx(.*?)wyx',x)
+Out[7]: ['liu', 'shun', 'xiang']
+很明显，通过括号的操作，就直接将想提取的内容抠下来了。
