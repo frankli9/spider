@@ -1,0 +1,19 @@
+ls=[1,2,3,'a','b','c']
+
+增
+ls.append('sim')          #[1, 2, 3, 'a', 'b', 'c', 'sim']          append方法每次只能在末尾填入一个元素；
+ls.extend(['xiaoxu',25])  #[1, 2, 3, 'a', 'b', 'c', 'xiaoxu', 25]   extend方法每次在末尾插入多个元；
+ls.insert(-5,'Mountain')   #[1, 'Mountain', 2, 3, 'a', 'b', 'c']    insert方法可在指定的位置插入一个元素；
+
+删
+ls.pop()        #[1, 2, 3, 'a', 'b']   #pop方法在不指定参数时默认删除末尾元素;
+ls.pop(-2)      #[1, 2, 3, 'a', 'c'] #也可以指定删除某个位置的元素；
+ls.remove('a')  #[1, 2, 3, 'b', 'c']
+del ls          #删除ls列表
+
+
+
+
+
+
+
