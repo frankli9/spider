@@ -42,8 +42,14 @@ print(dict1.setdefault('age1')) #{'age': [20, 23, 25, 22], 'id': [1, 2, 3, 4], '
 
 增
 
+dict2['income']=[100,200,300,400] #通过索引的方式增加键值对
+dict2.setdefault('age2',[0,0,0,0]) #setdefault方法增加键值对
+dict2.update({'weight':[10,20,30,40]})#update方法增加键值对
 
-
+删
+dict1.pop('age')  #对指定的键进行删除
+dict2.popitem()  #每次删除末尾的一个键值对
+dict3.update({'score':{'shuxue':88,'yuwen':82,'yingyu':79}})  #update方法中的参数一定是一个字典
 
 
 
