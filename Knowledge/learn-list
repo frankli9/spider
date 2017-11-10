@@ -12,7 +12,12 @@ ls.remove('a')  #[1, 2, 3, 'b', 'c']
 del ls          #删除ls列表
 
 
-
+改和其他方法
+# ls[2]=33               #[1, 2, 33, 'a', 'b', 'c']
+# ls[3:6]=['d','e','f']  #[1, 2, 3, 'd', 'e', 'f']
+ls3.reverse()            #倒序
+ls3.sort()               #升序
+ls3.sort(reverse=True)   #降序排列
 
 
 
