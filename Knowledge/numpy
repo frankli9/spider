@@ -1,0 +1,63 @@
+
+
+import numpy as np
+arr1=np.array([1,3,5,7,9])  #一维数组只需要给array函数传入一个列表或元组
+arr2=np.array((10,20,30,40,50))
+arr3=np.array([[1,2,3,4],[5,6,7,8],[9,10,11,12]])  #二维数组则是传入嵌套的列表或元组
+# print(arr1.shape)  #(5,)
+# print(arr3.shape)  #(3,4)#.shape返回一个数组的行数和列数，3行，4列
+
+#元素的获取
+# print(arr3[:,2],'\n')  #[3 7 5]   获取二维数组的索引2（第三列）
+# print(arr3[1,:],'\n')  #[5 6 7 8] 获取二维数组的索引1（第二行）
+# print(arr3[2,3],'\n')  #6         获取二维数组的索引2（第三行）3（第四列）的元素
+#print函数中的'\n'，目的用来换行，使打印出来的结果不显得那么拥挤。
+
+# print(arr3[[0,2],:],'\n')       #获取二维数组的第1行和第3行
+# print(arr3[:,[0,1,3]],'\n')     #获取二维数组的第1列、第2列和第4列
+# print(arr3[[0,2],[2,3]],'\n')   #[ 3 12]   #获取二维数组的第1行第3列的元素和第3行第4列的元素
+
+# print(arr3,'\n')
+# print(arr3[[0,2],:][:,[2,3]],'\n')  #获取第1行第3列的元素到第一行最后一个元素，和第3行第4列的元素到它前一个元素
+# print(arr3[np.ix_([0,2],[2,3])])      #与上一个方法一样，使用np.ix_()方法
+
+# 数学函数
+
+a=-4
+b=4
+# print(np.abs(a))       #取绝对值
+# print(np.fabs(a))      #取绝对值
+# print(np.sqrt(b))      #计算平方根
+# print(np.square(b))    #计算平方
+# print(np.exp(b))       #指数
+# print(np.log2(b))      #对数
+# print(np.log10(b))     #对数
+# print(np.log(b,1))     #对数
+# print(np.sign(a))      #符号函数（大于0的数返回1、小于0的数返回-1、0返回0值）
+# print(np.cell(a))      #向上取整
+# print(np.floor(a))     #向下取整
+# print(np.rint(a))      # 返回最近的整数
+# print(np.isnan(a))     # 判断是否缺失
+# print(np.isfinite(a))  # 判断是否有限
+# print(np.isinf(a))     # 判断是否无限
+# print(np.power)        # 幂运算
+# print(np.mod(a))       # 余数
+
+c=[1,2,3,1.2,1.3,-1,-1.2]
+# print(np.max(c))       # 最大值
+# print(np.min(c))       # 最大值
+# print(np.fmax(c))      # 浮点型的最大值.
+# print(np.fmin(c))      # 浮点型的最小值
+# print(np.sum(c))       # 求和
+# print(np.mean(c))      # 均值
+# print(np.std(c))       # 标准差
+# print(np.var(c))       # 方差
+# print(np.median(c))    # 中位数
+
+# 映射函数apply_along_axis
+# print(np.apply_along_axis(func1d=np.mean,axis=1,arr=arr3),'\n')   # 对矩阵的每一行计算均值
+# print(np.apply_along_axis(func1d=np.sum,axis=0,arr=arr3),'\n')   # 对矩阵的每一列计算和
+
+
+
+
