@@ -19,6 +19,36 @@ ls3.reverse()            #倒序
 ls3.sort()               #升序
 ls3.sort(reverse=True)   #降序排列
 
+元组
+由于元组不可变，所以没有增、删、改的权限
+
+查
+t=(1,2,3,'a','b','c') 
+
+t[-1::-1]   #('c', 'b', 'a', 3, 2, 1)
+t.count('a')
+t.index('c')
+t2=copy.copy(t)
+
+字典
+
+dict1={'id':[1,2,3,4],'name':['a','b','c','d'],'age':[20,23,25,22]}
+dict2=dict(id=list(range(1,5)),name=['lsx','xx','local','host'],gender=['f','m','m','f'])
+dict3={'name':'lsx','score':{'shuxue':88,'yuwen':79,'yingyu':82}}
+print(dict1['id'])              #[1, 2, 3, 4]
+print(dict1.get('name'))        #['a', 'b', 'c', 'd']
+print(dict1.setdefault('age'))  #[20, 23, 25, 22] ,等同于get
+print(dict1.setdefault('age1')) #{'age': [20, 23, 25, 22], 'id': [1, 2, 3, 4], 'age1': None, 'name': ['a', 'b', 'c', 'd']} ,没有就添加
+
+增
 
 
 
+
+
+
+
+
+
+print(dict1.setdefault('age2',[0,0,0,0,]))  #{'name': ['a', 'b', 'c', 'd'], 'age': [20, 23, 25, 22], 'age1': None, 'age2': [0, 0, 0, 0], 'id': [1, 2, 3, 4]}
+print(dict1)
