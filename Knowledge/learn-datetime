@@ -1,0 +1,14 @@
+import datetime
+dt='2017/04/24 22:09:48'
+d='2017-04-24'
+
+str2datetime=datetime.datetime.strptime(dt,'%Y/%m/%d %H:%M:%S')
+str2date1=datetime.datetime.strptime(d,'%Y-%m-%d')
+#如果你不想保留日期后面的时间部分00:00:00，只需在末尾加上date()方法。
+str2date2=datetime.datetime.strptime(d,'%Y-%m-%d').date()
+print(str2datetime)
+print(str2date1)
+print(str2date2)
+
+
+
