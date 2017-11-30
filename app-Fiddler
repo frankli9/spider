@@ -1,0 +1,30 @@
+import json,requests,random,time
+from bs4 import BeautifulSoup
+from lxml import etree
+from urllib.request import urlretrieve
+
+
+headers={
+    'User-Agent': 'Dalvik/1.6.0 (Linux; U; Android 4.4.4; G750-T20 Build/KTU84P)',
+    'Accept-Charset': 'UTF-8',
+    'Accept-Encoding': 'gzip,deflate',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Content-type': 'application/x-www-form-urlencoded',
+    'Connection': 'Keep-Alive',
+    'Host': 'gamehelper.gm825.com',
+    }
+
+proxy_list=[]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+
+heros_url ='http://gamehelper.gm825.com/wzry/hero/list?channel_id=90001a&app_id=h9044j&game_id=7622&game_name=%E7%8E%8B%E8%80%85%E8%8D%A3%E8%80%80&vcode=12.0.2&version_code=1202&cuid=6C2660B027E6F20B33CBC9345D17C31E&ovr=4.4.4&device=Huawei_G750-T20&net_type=1&client_id=IoRVubCIewvB01IPvbOYNg%3D%3D&info_ms=bnRTcq%2FHoJla6vqc6bL3lQ%3D%3D&info_ma=uJ0%2FhX7GGaTHwCbGKtc%2FlPgvLUT0GCCAfVYrR1zoCAs%3D&mno=0&info_la=3zkVApLW9qF9ViUVO74H%2FA%3D%3D&info_ci=3zkVApLW9qF9ViUVO74H%2FA%3D%3D&mcc=0&clientversion=&bssid=33hfOXa4T3jBw2C7jBgu%2B1NcdsoYS6Av3CRPoTSJEbI%3D&os_level=19&os_id=2067042611067834&resolution=720_1280&dpi=192&client_ip=10.0.3.15&pdunid=unknown'
+req=requests.get(url=heros_url,headers=headers,proxies=proxies).json()
+for each_hero in req['list']:
+    hero_photo_url = each_hero['cover']
+
+    print(hero_photo_url)
