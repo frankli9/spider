@@ -1,0 +1,30 @@
+import requests,random
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.proxy import Proxy
+from selenium.webdriver.common.proxy import ProxyType
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+proxy_list=[
+    'http://114.115.140.25:3128',#好的
+    ]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+proxy = [
+            '--proxy=114.115.140.25:3128',
+            '--proxy-type=http',
+            '--ignore-ssl-errors=true',
+            '--ssl-protocol=tlsv1'
+        ]
+
+desired_capabilities = DesiredCapabilities.PHANTOMJS.copy()
+driver = webdriver.PhantomJS(executable_path="C:\\Program Files (x86)\\phantomjs-2.1.1-windows\\bin\\phantomjs.exe",desired_capabilities=desired_capabilities,service_args=proxy)
+# driver.proxy_type=ProxyType.MANUAL
+# driver.http_proxy=proxy_ip
+# driver.add_to_capabilities(desired_capabilities)
+driver.get('https://www.baidu.com')
+html=driver.page_source
+print(html)
