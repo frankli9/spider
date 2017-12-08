@@ -1,0 +1,132 @@
+import requests,random,os,time
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.proxy import Proxy
+from selenium.webdriver.common.proxy import ProxyType
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+    'Cookie':'__gads=ID=e90e92452442eef2:T=1497427490:S=ALNI_MZi4whQxIsWkk8QW0yrpnZ7MyTtfw; bdshare_firstime=1497599748961; PHPSESSID=jbnm2jk08p9fripuj44lu07427; yunsuo_session_verify=df3422073e655cde45e3dc9018fb2f94; Hm_lvt_adaf29565debc85c07b8d3c36c148a6b=1497604233,1497604246,1497604251,1497921441; Hm_lpvt_adaf29565debc85c07b8d3c36c148a6b=1497930371; AJSTAT_ok_pages=74; AJSTAT_ok_times=3',
+}
+
+proxy_list=[
+           'http://114.115.140.25:3128',#好的
+
+            'http://120.198.224.6:8080',
+            'http://120.198.224.5:8088',
+            'http://61.155.164.106:3128',
+            'http://219.139.130.49:80',
+            'http://124.165.252.72:80',
+            'http://123.112.17.234:53281',
+            'http://42.245.252.36:80',
+            'http://113.108.204.74:8888',
+            'http://14.221.164.75:9797',
+            # 'http://112.114.76.237:8118',
+            'http://60.191.134.165:9999',
+    ]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+def mkdir(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
+
+def SavePic(filename,url):
+    content = requests.get(url,headers=headers,proxies=proxies).content
+    with open(filename,'wb') as f:
+        f.write(content)
+
+def get_TOF(index_url):
+    time.sleep(3)
+    '''
+    获取漫画的目录中的每一章节的url连接
+    并返回一个字典类型k：漫画名 v：章节链接
+    '''
+    url_list = []
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--proxy-server=%s'%str(proxy_ip))
+    chrome = webdriver.Chrome(chrome_options=chrome_options)
+    chrome.get(index_url)
+    chrome.implicitly_wait(3)
+
+    # print(chrome.page_source)
+
+    # 找到漫画标题 并创建目录
+    title = chrome.title.split(',')[0]
+    mkdir(title)
+    # 找到漫画章节，注意，漫画可能会有多种篇章
+    # 例如番外，正文，短片等等
+    comics_lists = chrome.find_elements_by_class_name('comic_Serial_list')
+    for part in comics_lists:
+        links=part.find_elements_by_tag_name('a')
+        for link in links:
+            url_list.append(link.get_attribute('href'))
+    chrome.quit()
+    Comics = dict(name=title,urls=url_list)
+    # print(Comics)
+    return Comics
+
+
+def get_pic(Comics):
+    time.sleep(3)
+    '''
+    打开每个章节的url，
+    找到漫画图片的地址，
+    并写入到本地
+    '''
+    comic_list = Comics['urls']
+    basedir = Comics['name']
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--proxy-server=%s' % str(proxy_ip))
+    chrome = webdriver.Chrome(chrome_options=chrome_options)
+    for url in comic_list:
+        chrome.get(url)
+        chrome.implicitly_wait(3)
+        dirname = basedir + '/' + chrome.title.split('-')[1]
+        mkdir(dirname)
+        # 找到该漫画一共有多少页
+        pageNum = len(chrome.find_elements_by_tag_name('option'))
+        # 找到下一页的按钮
+        nextpage = chrome.find_element_by_xpath('//*[@id="AD_j1"]/div/a[4]')
+        # 找到图片地址，并点击下一页
+        for i in range(pageNum):
+            pic_url = chrome.find_element_by_id('curPic').get_attribute('src')
+            filename = dirname + '/' + str(i) + '.png'
+            SavePic(filename, pic_url)
+            # 点击下一页的按钮，加载下一张图
+            nextpage.click()
+
+        print('当前章节\t{}  下载完毕'.format(chrome.title))
+
+    chrome.quit()
+    print('所有章节下载完毕')
+
+
+def main():
+    Comics1 = get_TOF('http://comic.sfacg.com')
+    get_pic(Comics1)
+
+if __name__ == '__main__':
+    main()
+
+
+
+# 找到第一个匹配的元素
+# find_element_by_id
+# find_element_by_name
+# find_element_by_xpath
+# find_element_by_link_text
+# find_element_by_partial_link_text
+# find_element_by_tag_name
+# find_element_by_class_name
+# find_element_by_css_selector
+
+
