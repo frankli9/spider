@@ -1,0 +1,139 @@
+import requests,random,time
+from bs4 import BeautifulSoup
+
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+    'Cookie':'__gads=ID=e90e92452442eef2:T=1497427490:S=ALNI_MZi4whQxIsWkk8QW0yrpnZ7MyTtfw; bdshare_firstime=1497599748961; PHPSESSID=jbnm2jk08p9fripuj44lu07427; yunsuo_session_verify=df3422073e655cde45e3dc9018fb2f94; Hm_lvt_adaf29565debc85c07b8d3c36c148a6b=1497604233,1497604246,1497604251,1497921441; Hm_lpvt_adaf29565debc85c07b8d3c36c148a6b=1497930371; AJSTAT_ok_pages=74; AJSTAT_ok_times=3',
+}
+
+proxy_list=[
+
+]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+# url = 'q u . l a /p a i h a n g b a n g/'
+def get_html(url):
+    try:
+        r = requests.get(url,headers=headers,proxies=proxies,timeout=30)
+        r.raise_for_status()
+        #这个网站使用utf-8是？？？问好，使用gb2312部分字是������，要使用gbk
+        r.encoding='utf-8'
+        # print(r.text)
+        return r.text
+    except:
+        return 'something wrong'
+
+def get_content(url):
+    html = get_html(url)
+    soup = BeautifulSoup(html,'lxml')
+    time.sleep(3)
+    category_list=soup.find_all('div',class_='index_toplist mright mbottom')
+    history_finished_list = soup.find_all('div',class_='index_toplist mbottom')
+    url_list = []
+    for cate in category_list:
+        name=cate.find('div',class_='toptab').span.string
+        with open('novel_list.csv','a+') as f:
+            f.write('\n说种类：{} \n'.format(name))
+
+        general_list = cate.find(style='display: none;')
+        # print(general_list)
+        book_list = general_list.find_all('li')
+        # print(book_list)
+        for book in book_list:
+            link = 'http://www.qu.la' + book.a['href']
+            title = book.a['title']
+            url_list.append(link)
+            with open('novel_list.csv', 'a') as f:
+                f.write("小说名：{} \t 小说地址：{} \n".format(title, link))
+
+    return url_list
+#['http://www.q u.l a/b o ok/68/', 'http://www.q u .l a/book/4140/',]
+# url='https://www.qu.la/paihangbang/'
+# get_content(url)
+
+def get_txt_url(url):
+    url_list=[]
+    html = get_html(url)
+    soup = BeautifulSoup(html, 'lxml')
+    time.sleep(3)
+    lista = soup.find_all('dd')
+    txt_name = soup.find('dd').a.text
+    # print(txt_name)第一章 扫地小厮
+    with open('E:\\pachong\\learn-spider\\{}.txt'.format(txt_name), "a+") as f:
+        f.write('\n小说标题：{} '.format(txt_name))
+    for urla in lista:
+        url_list.append('http://w w w .q u .l a/' + urla.a['href'])
+
+    return url_list, txt_name
+
+# url = 'https://w w w . q u .l a/book/68/'
+# get_txt_url(url)
+
+
+def get_one_txt(url, txt_name):
+    '''
+    获取小说每个章节的文本
+    并写入到本地
+    '''
+    html = get_html(url).replace('<br/>', '\n')
+    soup = BeautifulSoup(html, 'lxml')
+    # print(html)
+    try:
+        txt = soup.find('div', id='content').text.replace('chaptererror();', '')
+        title = soup.find('title').text
+        # print(txt)
+        with open('E:\\pachong\\learn-spider\\{}.txt'.format(txt_name), 'a+',encoding='utf-8') as f:
+            f.write(title + '\n\n')
+            f.write(txt)
+            print('当前小说：{} 当前章节{} 已经下载完毕'.format(txt_name, title))
+    except:
+        print('someting wrong')
+# url = 'https://w w w .q u .l a/book/68/56520.html'
+# txt_name = '第一章 扫地小厮'
+# get_one_txt(url, txt_name)
+
+def get_all_txt(url_list):
+    '''
+    下载排行榜里所有的小说
+    并保存为txt格式
+    '''
+    for url in url_list:
+        # 便利获取当前小说的所有章节的目录，
+        # 并且生成小说头文件
+
+        page_list, txt_name = get_txt_url(url)
+        for page_url in page_list:
+            # 遍历每一篇小说，并下载到目录
+            get_one_txt(page_url, txt_name)
+            print('当前进度 {}% '.format(url_list.index(url) / len(url_list) * 100))
+
+url_list=['https://w w w . q u .l a/book/68/','https://w w w . q u.l a/book/4140/']
+# get_all_txt(url_list)
+
+# print((url_list.index('https:// w w w. q u .l a /book/4140/')+1)/ len(url_list) * 100)
+
+def main():
+    # 排行榜地址：
+    base_url = 'http://w w w.q u.l a/paihangbang/'
+    # 获取排行榜中所有小说的url连接
+    url_list = get_content(base_url)
+    # 除去重复的小说，增加效率
+    url_list = list(set(url_list))
+    get_all_txt(url_list)
+
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+
