@@ -1,0 +1,61 @@
+import requests,random,os,time,re,signal,multiprocessing,socket,json
+from lxml import etree
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.proxy import Proxy
+from selenium.webdriver.common.proxy import ProxyType
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+}
+
+proxy_list=[
+
+    ]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+def get_pages():
+    '''获取该类新闻的总页数'''
+    urls=set()
+    url_lists=set()
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--proxy-sever=%s'%str(proxy_ip))
+    driver = webdriver.Chrome(chrome_options=chrome_options)
+    driver.get('http://www.sjtxt.com/book/52991/')
+    time.sleep(3)
+    dom_tree2 = etree.HTML(driver.page_source)
+    article_urls = dom_tree2.xpath('.//*[@id="info"]/div/ul/li/a/@href')
+    for article_url in article_urls:
+        url='sj'+article_url
+        urls.add(url)
+
+    return list(urls)
+
+def get_new(urls):
+    for url in urls:
+
+        html = requests.get(url, headers=headers,proxies=proxies).content.decode('utf-8','ignore')
+        # print(html)
+        time.sleep(3)
+        dom_tree = etree.HTML(html)
+        words=dom_tree.xpath('.//div[@id="content1"]//text()')
+        title=dom_tree.xpath('.//*[@id="info"]/div/h1//text()')[0]
+        with open('***.txt','a+',encoding='utf-8') as f:
+            f.write(title+'\n')
+            for word in words:
+                f.write(word+'\n')
+                print(word)
+    print(urls)
+
+if __name__ == '__main__':
+    get_new(get_pages())
