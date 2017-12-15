@@ -83,3 +83,4 @@ def get_new(urls):
 if __name__ == '__main__':
     get_new(get_pages())
     time.sleep(5)
+    
