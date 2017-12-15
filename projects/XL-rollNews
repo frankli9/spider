@@ -1,0 +1,103 @@
+import requests,random,os,time,re,signal,multiprocessing,socket,json
+from lxml import etree
+from bs4 import BeautifulSoup
+
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+    'Cookie':'__gads=ID=e90e92452442eef2:T=1497427490:S=ALNI_MZi4whQxIsWkk8QW0yrpnZ7MyTtfw; bdshare_firstime=1497599748961; PHPSESSID=jbnm2jk08p9fripuj44lu07427; yunsuo_session_verify=df3422073e655cde45e3dc9018fb2f94; Hm_lvt_adaf29565debc85c07b8d3c36c148a6b=1497604233,1497604246,1497604251,1497921441; Hm_lpvt_adaf29565debc85c07b8d3c36c148a6b=1497930371; AJSTAT_ok_pages=74; AJSTAT_ok_times=3',
+}
+
+proxy_list=[
+
+    ]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+def get_pages():
+    '''获取该类新闻的总页数'''
+    urls=set()
+    for page in range(6,10):
+
+        url = 'http://roll.news.sina.com.cn/interface/rollnews_ch_out_interface.php?'
+        params = {'col':'89',
+                  'spec':'',
+                  'type':'',
+                  'ch': '01',
+                  'k':'',
+                  'offset_page:': '0',
+                  'offset_num': '0',
+                  'num': '60',
+                  'asc:': '',
+                  'page': page,
+                  'r':'0.911916882483556',
+                  }
+        html = requests.get(url, headers=headers,proxies=proxies,params=params).content.decode('gbk','ignore')#.encode('utf-8')
+        # print(html)
+        # print(type(html))
+        total = re.findall('count : [0-9]+', html)  # 获取该类新闻总条数
+        article_url_lists = re.findall('"http://.*?"', html)
+        # print(article_url_lists)
+        time.sleep(5)
+        for url in article_url_lists:
+
+            urls.add(url.strip('"'))
+        print('正在准备爬取第', page, '页')
+    return list(urls)
+
+        # print(total)
+    # 由每次请求1000条新闻，计算出总页数
+    # if total % 1000 != 0:
+    #     pages = (total / 1000) + 1
+    # else:
+    #     pages = total / 1000
+    # return pages
+# get_pages()
+
+
+
+def get_new(urls):
+
+    for url in urls:
+        html = requests.get(url, headers=headers,proxies=proxies).content.decode('utf-8','ignore')
+        # print(html)
+        time.sleep(3)
+        dom_tree = etree.HTML(html)
+        if len(dom_tree.xpath('//*[@id="artibody"]/p//text()')) == 0:
+            words = dom_tree.xpath('//*[@id="article"]/p//text()')
+        else:
+            words = dom_tree.xpath('//*[@id="artibody"]/p//text()')
+        # print(word)
+        # print(type(word))
+        for word in words:
+            with open('sina-滚动新闻.txt','a+',encoding='utf-8') as f:
+                f.write(word+'\n')
+                print(word)
+
+# urls = ['http://news.sina.com.cn/c/gat/2017-12-15/doc-ifyptfcn0587283.shtml','http://finance.sina.com.cn/money/forex/forexfxyc/2017-12-15/doc-ifyptkyk4614363.shtml']
+
+# get_new(urls)
+
+if __name__ == '__main__':
+    get_new(get_pages())
+    time.sleep(5)
+
+
+
+
+
+
+
+
+
+
+
+
+
