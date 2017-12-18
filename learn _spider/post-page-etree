@@ -1,0 +1,33 @@
+import requests,random
+from bs4 import BeautifulSoup
+from lxml import etree
+url='https://dyn.ithome.com/ithome/getajaxdata.aspx'
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+}
+
+proxy_list=[
+,  # 好的，目前能用
+    ]
+proxy_ip=random.choice(proxy_list)
+proxies={'http':proxy_ip}
+
+data={
+    'newsID':'323076',
+    'hash':'970DDF040F24477B',
+    'type':'commentpage',
+    'page':'1',
+    'order':'false',
+    
+    }
+r=requests.post(url,proxies=proxies,headers=headers,data=data)
+dom_tree = etree.HTML(r.content.decode('utf-8','ignore'))
+comments = dom_tree.xpath('.//div[@class="re_comm"]/p/text()')
+re_comments = dom_tree.xpath('.//div[@class="comm"]/p/text()')
+print(comments)
+print(re_comments)
