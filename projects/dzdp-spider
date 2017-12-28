@@ -1,0 +1,78 @@
+import requests,random,os,time,multiprocessing,re
+from bs4 import BeautifulSoup
+from lxml import etree
+
+
+headers={
+
+}
+#使用代理服务器
+proxy_list=[
+
+]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+second=[1,2,]
+sleep_second = random.choice(second)
+
+
+def get_item_info(shopid,cityid,cityname):
+    html = requests.get('cp1Z'.format(shopid,cityid), headers=headers, proxies=proxies).text#.content.decode('utf-8', 'ignore').encode('utf-8')
+    # print(html)
+    # print(type(html))
+    # dom_tree = etree.HTML(html)
+    pinglunes = re.findall('"reviewBody":".*?"',html)
+    pinglun_list=set()
+    with open('E:\\Chinese\\缪总项目\\儿童-中英混-2017-12-6\\第二批整理完\\大众点评\\{}-.txt'.format(cityname), 'a+', encoding='utf-8') as f:
+        for pinglun in pinglunes:
+            s=pinglun.strip('"reviewBody":').replace('&nbsp;',' ').replace('<br />','')
+            if s not in pinglun_list:
+                f.write(s+'\n')
+                pinglun_list.add(s)
+                # print(s)
+
+# url='http://www.'
+# get_item_info(shopid,cityid)
+
+
+#提取地址
+def get_links_from(cityid):
+    urls=[]
+    for j in range(1,5):
+        print('开始采集第',j,'页')
+        list_view = ''.format(str(cityid),j)
+        wb_data = requests.get(list_view,headers=headers,proxies=proxies)
+        soup=BeautifulSoup(wb_data.text,'lxml')
+        cityname=soup.select('a.city.J-city > span')[0].string
+        # print(cityname)
+        for link in soup.select('div.tit > a:nth-of-type(1)'):
+            item_link=link.get('href').split('/')[-1]
+            urls.append(item_link)
+            # print(item_link)
+
+        for i in urls:
+            get_item_info(i,cityid,cityname)
+            time.sleep(3)
+
+get_links_from('2464')
+#
+# for i in range(150,160): # 
+#     get_links_from(i)
+#     print('第 ',i,' 页爬取完'+'\n'+'********************************************************************************'+'\n')
+
+# if __name__=='__main__':
+#     pool=multiprocessing.Pool()
+#     pool.map(get_links_from,[i for i in range(120,140)])#i for i in range(55, 60)[::-1]#190
+
+
+
+
+
+
+
+
+
+
