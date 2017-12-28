@@ -1,0 +1,62 @@
+import requests,random,os,time,re,signal,multiprocessing,socket,json
+from lxml import etree
+from bs4 import BeautifulSoup
+
+headers={
+
+}
+
+proxy_list=[
+
+    ]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+def get_item_info(url):
+    html = requests.get(url,headers=headers,proxies=proxies).content.decode('utf-8','ignore')#.encode('gbk')
+    dom_tree = etree.HTML(html)
+    word = dom_tree.xpath('.//*[@id="artibody"]/p//text()')
+    # print(word)
+    with open('.txt', 'a', encoding='utf-8') as f:
+        f.write('\n')
+        for a in word:
+            f.write(a)
+            print(a)
+        # print(word)
+
+# url='http://ent.sina.com.cn/y/yrihan/2017-12-27/doc-ifypyuvc5633786.shtml'
+# get_item_info(url)
+
+
+
+def get_links_from(page):
+    urls=[]
+    list_view='http://roll.ent.sina.com.cn/ent_more/yl2/index_{}.shtml'.format(str(page)) #http://auto.huanqiu.com/news/30.html
+    wb_data = requests.get(list_view,headers=headers,proxies=proxies)
+    soup=BeautifulSoup(wb_data.text,'lxml')
+    # time.sleep(3.5)
+    for link in soup.select('div.listBlk > ul > li > a'):
+        item_link=link.get('href')
+        urls.append(item_link)
+        # print(item_link)
+    print(urls)
+    print(len(urls))
+    print('This is page',page)
+
+    for i in urls:
+        get_item_info(i)
+        time.sleep(2)
+
+# get_links_from(2)
+
+# for i in range(20,31):
+#     get_links_from(i)
+#     print('第 ',i,' 页爬取完')
+
+# 多线程
+if __name__=='__main__':
+    pool=multiprocessing.Pool()
+    pool.map(get_links_from,[i for i in range(150,200)])#i for i in range(55, 60)[::-1]
+
