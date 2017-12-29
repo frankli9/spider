@@ -1,0 +1,109 @@
+from bs4 import BeautifulSoup
+import requests,multiprocessing,json
+import time
+from lxml import etree
+import random
+from PIL import Image
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.proxy import Proxy
+from selenium.webdriver.common.proxy import ProxyType
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+
+
+
+#模拟浏览器登录
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+}
+#使用代理服务器
+proxy_list=[
+
+
+    ]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+#不适合selenium
+# def get_links_from():
+#     chrome_options = webdriver.ChromeOptions()
+#     chrome_options.add_argument('--proxy-server=%s'%str(proxy_ip))
+#     chrome = webdriver.Chrome(chrome_options=chrome_options)
+#     chrome.get('http://news.sciencenet.cn/fieldlist.aspx?id=3')
+#     chrome.implicitly_wait(5)
+#     # time.sleep(30)
+#     print(chrome.page_source)
+#     chrome.driver.findElement(By.linkText("About Google")).click()
+    # for i in range(1,11):
+    #     chrome.find_element_by_xpath('.//*[@id="AspNetPager1"]/table/tbody/tr/td[2]/a[13]').click()
+    #     print(chrome.page_source)
+    #     print('以上是第',i,'页内容')
+    #     chrome.implicitly_wait(5)
+    # chrome.find_element_by_xpath('.//*[@id="AspNetPager1"]/table/tbody/tr/td[2]/a[14]').click()
+    # print(chrome.page_source)
+    # comics_lists = chrome.find_elements_by_class_name('comic_Serial_list')
+    # chrome.find_element_by_xpath('//*[@id="u1"]/a[8]').click()
+
+
+
+def get_item_info(url):
+
+
+    html = requests.get(url,headers=headers,proxies=proxies).content.decode('utf-8','ignore').encode('utf-8')
+    dom_tree = etree.HTML(html)
+    words = dom_tree.xpath('.//p[@style="text-indent: 2em"]/text()')
+    # print(words)
+    with open('.txt', 'a', encoding='utf-8') as f:
+        f.write('\n')
+        for word in words:
+            f.write(word.replace('\t\n',''))
+            print(word)
+            
+
+#提取每页的文章链接数，这是一个list
+def get_links_from(shiji_page):
+    print('开始采集第',shiji_page,'页')
+
+    urls=[]
+    form_data = {
+        '__VIEWSTATE':'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',
+        '__EVENTTARGET': 'AspNetPager1',
+        '__EVENTARGUMENT': str(shiji_page),#3
+        'AspNetPager1_input': str(int(shiji_page-1)),#2
+    }
+
+    list_view='http://sciencenet' 
+    wb_data = requests.post(list_view,headers=headers,proxies=proxies,data=form_data)#.content.decode('utf-8','ignore').encode('utf-8')
+    soup = BeautifulSoup(wb_data.text,'lxml')
+    # print(soup.prettify())
+    page_urls = soup.select('tr > td > table > tr > td > a')
+    for url in page_urls:
+        wanzheng_url='http://'+url.get('href')
+        urls.append(wanzheng_url)
+        print(wanzheng_url)
+
+
+    for i in urls:
+        get_item_info(i)
+        time.sleep(3)
+
+
+# for i in range(1,2):
+#     get_links_from(i)
+#     print('第 ',i,' 页爬取完')
+
+# 多线程
+if __name__=='__main__':
+    pool=multiprocessing.Pool()
+    pool.map(get_links_from,[i for i in range(2, 10)])#i for i in range(55, 60)[::-1]
