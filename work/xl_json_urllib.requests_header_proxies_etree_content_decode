@@ -1,0 +1,77 @@
+from bs4 import BeautifulSoup
+import requests,multiprocessing,json
+import time,random,demjson
+from lxml import etree
+import urllib.request
+
+
+#知识点包括urllib——IP、etree.decode('utf-8','ignore')、json_loads and json_dumps
+
+headers = {
+    'Host':'feed.mix.sina.com.cn',
+    'Referer':'http://tech.sina.com.cn/discovery/',
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36',
+
+}
+
+proxy_list = [
+
+]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+
+def get_artile(url):
+    try:
+        html = requests.get(url,headers=headers,proxies=proxies)
+        # print(html)
+        dom_tree = etree.HTML(html.content.decode('utf-8','ignore'))
+        texts = dom_tree.xpath('.//div[@class="article"]/p//text()')
+        with open ('E:\\.txt','a+',encoding='utf-8') as f:
+            for text in texts:
+                f.write('\n')
+                f.write(text)
+                print(text)
+    except:
+        pass
+
+
+
+
+def get_sina_json():
+
+    urls = []
+    url = ''
+    proxy_support = urllib.request.ProxyHandler({'http': proxy_ip})
+    opener = urllib.request.build_opener(proxy_support, urllib.request.ProxyHandler)
+    urllib.request.install_opener(opener)
+    #注意顺序
+    request = urllib.request.Request(url, headers=headers)
+    response = urllib.request.urlopen(request)
+
+    with  response as f:
+        json_b=f.read()[26:-14].decode('utf-8')
+        # print(json_b)
+
+    json1 = json.loads(json_b)
+    # print(json1)
+    json1 = json.loads(json.dumps(json1["result"]["data"][3:], ensure_ascii=False))
+    for item in json1:
+        if str(item["url"]):#.startswith('''http://slide.''')
+            # for link in item["url"]:
+            print(item["url"])
+            urls.append(item["url"])
+    print(len(urls))
+    # return urls
+    # print(len(urls))
+    for url1 in urls:
+        get_artile(url1)
+        time.sleep(3)
+
+get_sina_json()
+
+
+
