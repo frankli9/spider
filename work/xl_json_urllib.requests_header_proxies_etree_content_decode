@@ -5,16 +5,21 @@ from lxml import etree
 import urllib.request
 
 
-#知识点包括urllib——IP、etree.decode('utf-8','ignore')、json_loads and json_dumps
 
 headers = {
-    'Host':'feed.mix.sina.com.cn',
-    'Referer':'http://tech.sina.com.cn/discovery/',
-    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.9',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
 
+    'Upgrade-Insecure-Requests':'1',
+
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36',
 }
 
 proxy_list = [
+
 
 ]
 
@@ -25,12 +30,30 @@ print(proxy_ip)
 
 
 def get_artile(url):
+    print(url)
     try:
-        html = requests.get(url,headers=headers,proxies=proxies)
-        # print(html)
-        dom_tree = etree.HTML(html.content.decode('utf-8','ignore'))
-        texts = dom_tree.xpath('.//div[@class="article"]/p//text()')
-        with open ('E:\\.txt','a+',encoding='utf-8') as f:
+        html = requests.get(url,headers=headers,proxies=proxies).content.decode('utf-8','ignore')
+        dom_tree = etree.HTML(html)
+        if dom_tree.xpath('.//div[@class="article"]/p//text()'):
+            texts = dom_tree.xpath('.//div[@class="article"]/p//text()')
+
+        elif dom_tree.xpath('.//div[@class="BSHARE_POP blkContainerSblkCon clearfix blkContainerSblkCon_14"]/p//text()'):
+            texts = dom_tree.xpath('.//div[@class="BSHARE_POP blkContainerSblkCon clearfix blkContainerSblkCon_14"]/p//text()')
+
+        elif dom_tree.xpath('.//div[@class="content"]/p//text()'):
+            texts = dom_tree.xpath('.//div[@class="content"]/p//text()')
+
+        elif dom_tree.xpath('.//*[@id="artibody"]/p/span//text()'):
+            texts = dom_tree.xpath('.//*[@id="artibody"]/p/span//text()')
+
+        elif dom_tree.xpath('.//*[@id="artibody"]/p//text()'):
+            texts = dom_tree.xpath('.//*[@id="artibody"]/p//text()')
+
+        else:
+            texts = dom_tree.xpath('.//div[@class="content"]/p//text()')
+
+
+        with open ('E:97.txt','a+',encoding='utf-8') as f:
             for text in texts:
                 f.write('\n')
                 f.write(text)
@@ -38,40 +61,59 @@ def get_artile(url):
     except:
         pass
 
+# url='http://tech.sina.com.cn/d/2017-12-26/doc-ifypxrpp4050442.shtml'
+# get_artile(url)
 
 
-
-def get_sina_json():
-
+def get_sina_json(i):
+    print('**************************开始采集第', i, '页***************************')
+    print('**************************开始采集第', i, '页***************************')
+    print('**************************开始采集第', i, '页***************************')
     urls = []
-    url = ''
+
+    url = ''.format(str(i))
     proxy_support = urllib.request.ProxyHandler({'http': proxy_ip})
     opener = urllib.request.build_opener(proxy_support, urllib.request.ProxyHandler)
     urllib.request.install_opener(opener)
     #注意顺序
-    request = urllib.request.Request(url, headers=headers)
-    response = urllib.request.urlopen(request)
+    try:
+        request = urllib.request.Request(url, headers=headers)
+        response = urllib.request.urlopen(request)
 
-    with  response as f:
-        json_b=f.read()[26:-14].decode('utf-8')
-        # print(json_b)
+        with  response as f:
+            json_b=f.read()[26:-14].decode('utf-8')
+            # print(json_b)
 
-    json1 = json.loads(json_b)
-    # print(json1)
-    json1 = json.loads(json.dumps(json1["result"]["data"][3:], ensure_ascii=False))
-    for item in json1:
-        if str(item["url"]):#.startswith('''http://slide.''')
-            # for link in item["url"]:
-            print(item["url"])
-            urls.append(item["url"])
-    print(len(urls))
-    # return urls
-    # print(len(urls))
-    for url1 in urls:
-        get_artile(url1)
-        time.sleep(3)
+        json1 = json.loads(json_b)
+        # print(json1)
+        json1 = json.loads(json.dumps(json1["result"]["data"][3:], ensure_ascii=False))
+        for item in json1:
+            if str(item["url"]):#.startswith('''http://slide.''')
+                # for link in item["url"]:
+                print(item["url"])
+                urls.append(item["url"])
+        print(len(urls))
+        time.sleep(2)
+        # return urls
+        # print(len(urls))
+        for url1 in urls:
+            get_artile(url1)
+            time.sleep(3)
+    except:
+        pass
 
-get_sina_json()
+
+
+if __name__ == '__main__':
+    # for i in range(69,71): 
+    #     print('**************************开始采集第', i, '页******************************')
+    #     get_sina_json(i)
+
+    pool=multiprocessing.Pool()
+    pool.map(get_sina_json,[i for i in range(79,98)])
+
+
+
 
 
 
