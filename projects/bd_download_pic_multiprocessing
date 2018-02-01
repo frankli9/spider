@@ -1,0 +1,57 @@
+import re,multiprocessing,time
+import sys
+import urllib.request
+import os
+import requests,random
+from urllib.parse import quote
+
+headers={
+
+}
+
+proxy_list=[
+
+    ]
+
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+def get_onepage_urls(onepageurl):
+
+    try:
+        html = requests.get(onepageurl,proxies=proxies,headers=headers).text
+        pic_urls = re.findall('"objURL":"(.*?)",', html, re.S)
+    except Exception as e:
+        print(e)
+        pic_urls = []
+        return pic_urls
+    return pic_urls
+
+def down_pic(pic_urls, localPath):
+    if not os.path.exists(localPath):  # 新建文件夹
+        os.mkdir(localPath)
+        #下载图片
+    for i, pic_url in enumerate(pic_urls):
+        try:
+            pic = requests.get(pic_url, proxies=proxies,headers=headers,timeout=15)
+            with open(localPath + '%d.jpg' % (i+1), 'wb')as f:
+                f.write(pic.content)
+                print('下载第%s张图片成功: %s' % (str(i + 1), str(pic_url)))
+        except Exception as e:
+            print('下载第%s张图片时失败: %s' % (str(i + 1), str(pic_url)))
+            print(e)
+            continue
+        time.sleep(5)
+
+def main(page):
+    url_init = 'https://image.bd.com'.format(page)
+    all_pic_urls = []
+    onepage_urls = get_onepage_urls(url_init)
+    all_pic_urls.extend(onepage_urls)
+    down_pic(list(set(all_pic_urls)), 'e:/图片/批量下载%s/' % str(page))
+
+if __name__ == '__main__':
+    pool= multiprocessing.Pool()
+    pool.map(main,[i for i in range(30,121,30)])
