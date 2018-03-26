@@ -1,0 +1,64 @@
+# -*- coding:utf-8 -*-
+
+from bs4 import BeautifulSoup
+import requests,time,random,os,re,urllib.request,json,multiprocessing
+from lxml import etree
+
+
+headers={
+    'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+    'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+    'Accept-Encoding':'gzip, deflate',
+    'Accept-Language':'zh-CN,zh;q=0.8',
+    'Cache-Control':'max-age=0',
+    'Connection':'keep-alive',
+    'Cookie':}
+
+proxy_list=[
+
+    ]
+proxy_ip = random.choice(proxy_list)
+proxies = {'http':proxy_ip}
+print(proxy_ip)
+
+
+def get_mp3(page):
+    print('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&第',page,'页&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
+    time.sleep(5)
+    url_1 = 'http://xinmin/2017-06/{}/'.format(page)
+    url=url_1+'node_1.htm'
+    html = requests.get(url,headers=headers,proxies=proxies)#.content.decode('utf-8')#,headers=headers,proxies=proxies
+    print(html.status_code)
+    if html.status_code == 200:
+        html = requests.get(url, headers=headers, proxies=proxies).content.decode('utf-8')
+        dom_tree = etree.HTML(html)
+        try:
+            pages = dom_tree.xpath('.//table[@id="bmdhTable"]/tbody/tr/td[1]/a/@href')
+            # print(pages)
+            for page1 in pages:
+                # print('#####正在解析',page,page1,'的内容#####')
+                time.sleep(2)
+                page_link = url_1+page1
+                html2 = requests.get(page_link, headers=headers, proxies=proxies).content.decode('utf-8')
+                dom_tree2 = etree.HTML(html2)
+                title_links = dom_tree2.xpath('.//div[@id="main-ed-map"]/map/area/@href')
+                # print(title_links)
+                for title_link1 in title_links:
+                    time.sleep(2)
+                    title_link = url_1+title_link1
+                    print('$$$$$正在解析第', page, '日', '第', page1, '栏目中的', title_link, '的内容$$$$$')
+                    html3 = requests.get(title_link, headers=headers, proxies=proxies).content.decode('utf-8')
+                    dom_tree3 = etree.HTML(html3)
+                    texts = dom_tree3.xpath('.//div[@id="ozoom"]/founder-content/p//text()')
+                    for text in texts:
+                        with open('E:\\201706{}报.txt'.format(page),'a+',encoding='utf-8') as f1:
+                            f1.write('\n')
+                            f1.write(text)
+        except:
+            pass
+    else:
+        pass
+
+if __name__ == '__main__':
+    pool= multiprocessing.Pool()
+    # pool.map(get_mp3,[i for i in range(1,10)]) 
