@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# @Time    : 2018/9/30 11:48
+# @Author  : LY
+# @File    : get_js2py.txt.py
+# @Software: PyCharm
+# @Brief   : None
+
+import requests
+from bs4 import BeautifulSoup
+import time
+import js2py
+
+start_urls = ['http://roll.news.sina.com.cn/interface/rollnews_ch_out_interface.php?col=89&spec=&type=&ch=01&k=&offset_page=0&offset_num=0&num=60&asc=&page={}'.format(i) for i in range(1, 10)]
+url = 'http://roll.news.sina.com.cn/interface/rollnews_ch_out_interface.php?col=89&spec=&type=&ch=01&k=&offset_page=0&offset_num=0&num=60&asc=&page=1'
+
+headers = {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate",
+        "Accept-Language": "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7",
+        # "Cache-Control": "no-cache",
+        # "Connection": "keep-alive",
+        # "Cookie": "UOR=www.google.com,www.sina.com.cn,; SGUID=1520816292777_83076650; SINAGLOBAL=211.103.136.242_1520816292.736990; SUB=_2AkMt-V_2f8NxqwJRmPEQy2vmZYx_zwjEieKbpa4tJRMyHRl-yD83qnIJtRB6BnlxGSLw2fy6O04cZUKTsCZUeiiFEsZE; SUBP=0033WrSXqPxfM72-Ws9jqgMF55529P9D9WhpFUZmqbYYLueonGrZIL2c; U_TRS1=0000001a.e268c0.5aaa0d39.35b0731a; lxlrttp=1521688012; Apache=223.72.62.219_1522208561.132697; ULV=1522208952476:6:6:3:223.72.62.219_1522208561.132697:1522208561158; U_TRS2=000000db.81c2323e.5abca69b.ad269c11; ArtiFSize=14; rotatecount=1; hqEtagMode=1",
+        # "Host": "roll.news.sina.com.cn",   这里host必须禁用掉
+        # "Pragma": "no-cache",
+        "Referer": "http://roll.news.sina.com.cn/s/channel.php?ch=01",
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36",
+    }
+
+response=requests.get(url,headers=headers).content
+# print(response)
+
+ret = js2py.eval_js(response.decode("gbk")) #  response.body.decode("gbk")
+print(ret.list)
+for url in ret.list:
+    print(url["url"])
